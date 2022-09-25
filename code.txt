@@ -1,0 +1,85 @@
+int ip = 0;
+int work = 1;
+int copy_var;
+
+int read = 0;
+int read_adr;
+int read_data;
+
+int save_inst = 0;
+int proc_inst = 0;
+int decode_inst = 0;
+int inst;
+
+int save_imm = 0;
+int read_imm = 0;
+int imm;
+
+
+string data = "`data";
+
+while(work){
+    if (read){
+        read = 0;
+        data[0] = read_adr;
+        if (data[0]){
+            data[1] = 0;
+            goto data[0];
+            asm("[-[->>>+<<<]>>>>[-]+<]");
+            asm(">[-]>[-<+<+>>]<[->+<]+");
+            asm("[<[-<<<+>>>]<<]");
+            asm("<");
+            goto data[0];
+            read_data = data[0];
+        } else {
+            read_data, copy_var = data[2];
+            data[2] = copy_var;
+        }
+    }
+
+    if (save_inst){
+        save_inst = 0;
+        inst = read_data;
+        ip += 1;
+    }elif (save_imm){
+        save_imm = 0;
+        imm = read_data;
+        ip += 1;
+    }
+
+    if(read_imm){
+        read_imm = 0;
+        read = 1;
+        save_imm = 1;
+        read_adr, copy_var = ip;
+        ip = copy_var;
+    }elif(proc_inst){
+        proc_inst = 0;
+        inst -= 1;
+        if(inst){
+        }else{
+            out imm;
+        }
+        inst += 1;
+    }elif(decode_inst){
+        decode_inst = 0;
+        proc_inst = 1;
+        inst -= 1;
+        if(inst){
+        }else{
+            read_imm = 1;
+        }
+        inst -= 0-1;
+        if(inst){
+        }else{
+            work = 0;
+        }
+        inst += 0;
+    }else{
+        save_inst = 1;
+        decode_inst = 1;
+        read = 1;
+        read_adr, copy_var = ip;
+        ip = copy_var;
+    }
+}
