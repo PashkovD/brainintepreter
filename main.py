@@ -1,18 +1,21 @@
 
 def main():
-    data = "\x01"+"\x01".join("Hello!") + "\x00"
+    data = "\x01"+"\x01".join("Hello world!\n") + "\x02\x00"
     names = {
         "data": repr(bytes("\x00\x00" + "\x00\x00".join(data), "utf-8"))[2:-1],
         "data_size": str(len(data)),
+
+        "stop": "0",
+        "out": "1",
+        "jmp": "2",
     }
     with open("code.txt") as f:
         code = f.read()
 
-    pos = 0
     code2 = ""
-    while len(code)>0:
+    while len(code) > 0:
 
-        pos = code.find("`", pos)
+        pos = code.find("`")
         if pos == -1:
             code2 += code[:]
             break
