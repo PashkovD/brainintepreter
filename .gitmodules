@@ -1,0 +1,3 @@
+[submodule "braincompiler"]
+	path = braincompiler
+	url = https://github.com/PashkovD/braincompiler.git
