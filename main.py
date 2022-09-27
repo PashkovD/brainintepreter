@@ -1,3 +1,5 @@
+from braincompiler.main import compile_code
+
 
 def main():
     data = "\x01"+"\x01".join("Hello world!\n") + "\x02\x00"
@@ -27,7 +29,10 @@ def main():
             code = code[1:]
         code2 += names[name]
 
-    print(code2)
+    data = compile_code(code2)
+    with open("out.bf", "w") as f:
+        for i in range(0, len(data), 100):
+            f.write(data[i:i + 100] + "\n")
 
 
 if __name__ == '__main__':
