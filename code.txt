@@ -1,10 +1,14 @@
 int ip = 0;
 int work = 1;
-int copy_var;
 
 int read = 0;
 int read_adr;
 int read_data;
+
+int write = 0;
+int write_adr;
+int write_data;
+
 
 int save_inst = 0;
 int proc_inst = 0;
@@ -21,8 +25,8 @@ string data = "`data";
 while(work){
     if (read){
         read = 0;
-        data[0] = read_adr;
-        if (data[0]){
+        if (read_adr){
+            data[0] = read_adr;
             data[1] = 0;
             goto data[0];
             asm("[-[->>>+<<<]>>>>[-]+<]");
@@ -32,8 +36,43 @@ while(work){
             goto data[0];
             read_data = data[0];
         } else {
-            read_data, copy_var = data[2];
-            data[2] = copy_var;
+            read_data = data[2];
+        }
+    }
+    if (write){
+        write = 0;
+        if (write_adr){
+            data[3] = write_adr;
+            data[3] -= 1;
+            data[4] = write_data;
+            data[1] = 0;
+            goto data[3];
+            while(data[3]){
+                data[3]-=1;
+                data[6]=0;
+                data[7]=0;
+                while(data[3]){
+                    data[3]-=1;
+                    data[6]+=1;
+                }
+                while(data[4]){
+                    data[4]-=1;
+                    data[7]+=1;
+                }
+                data[4]=1;
+
+                asm(">>>");
+            }
+            data[5]=0;
+            while(data[4]){
+                data[4]-=1;
+                data[5]+=1;
+            }
+            data[4]+=1;
+            goto data[4];
+            asm("[<<<]>>>");
+        } else {
+            write_data = data[2];
         }
     }
 
@@ -51,8 +90,7 @@ while(work){
         read_imm = 0;
         read = 1;
         save_imm = 1;
-        read_adr, copy_var = ip;
-        ip = copy_var;
+        read_adr = ip;
     }elif(proc_inst){
         proc_inst = 0;
         case(inst){
@@ -61,6 +99,11 @@ while(work){
             }
             `jmp:{
                 ip = imm;
+            }
+            `in:{
+                write_adr = imm;
+                in write_data;
+                write = 1;
             }
         }
     }elif(decode_inst){
@@ -76,12 +119,14 @@ while(work){
             `jmp:{
                 read_imm = 1;
             }
+            `in:{
+                read_imm = 1;
+            }
         }
     }else{
         save_inst = 1;
         decode_inst = 1;
         read = 1;
-        read_adr, copy_var = ip;
-        ip = copy_var;
+        read_adr = ip;
     }
 }
