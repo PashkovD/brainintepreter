@@ -1,4 +1,4 @@
-from braincompiler.main import compile_code
+from braincompiler import compile_code
 
 
 def main():
@@ -10,6 +10,7 @@ def main():
         "stop": "0",
         "out": "1",
         "jmp": "2",
+        "in": "3",
     }
     with open("code.txt") as f:
         code = f.read()

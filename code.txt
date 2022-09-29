@@ -55,36 +55,28 @@ while(work){
         ip = copy_var;
     }elif(proc_inst){
         proc_inst = 0;
-        inst -= `out;
-        if(inst){
-        }else{
-            out imm;
+        case(inst){
+            `out:{
+                out imm;
+            }
+            `jmp:{
+                ip = imm;
+            }
         }
-        inst -= `jmp-`out;
-        if(inst){
-        }else{
-            ip = imm;
-        }
-        inst += `jmp;
     }elif(decode_inst){
         decode_inst = 0;
         proc_inst = 1;
-        inst -= `out;
-        if(inst){
-        }else{
-            read_imm = 1;
+        case(inst){
+            `out:{
+                read_imm = 1;
+            }
+            `stop:{
+                work = 0;
+            }
+            `jmp:{
+                read_imm = 1;
+            }
         }
-        inst -= `stop-`out;
-        if(inst){
-        }else{
-            work = 0;
-        }
-        inst -= `jmp-`stop;
-        if(inst){
-        }else{
-            read_imm = 1;
-        }
-        inst += `jmp;
     }else{
         save_inst = 1;
         decode_inst = 1;
