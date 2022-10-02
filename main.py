@@ -12,8 +12,9 @@ def decorate(data: str) -> str:
 
 
 def main():
-    data = "\x03\x09\x03\x0B\x03\x0D\x03\x0F\x01\x23\x01\x23\x01\x23\x01\x23" + "\x00"
+    data = "\x03\x00\x01\x00\x03\x01\x01\x01\x03\x02\x01\x02" + "\x00"
     names = {
+        "cell_size": 256,
         "data": decorate(data),
         "data_size": str(len(data)),
 

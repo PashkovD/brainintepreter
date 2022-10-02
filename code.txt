@@ -1,5 +1,8 @@
 int ip = 0;
 int work = 1;
+string Reg ="\0\0\0\0\0\0\0\0";
+int var1 = 0;
+int var2 = 0;
 
 int read = 0;
 int read_adr;
@@ -95,15 +98,33 @@ while(work){
         proc_inst = 0;
         case(inst){
             `out:{
-                out imm;
+                imm %= 8;
+                case(imm){
+                    0:{out Reg[0];}
+                    1:{out Reg[1];}
+                    2:{out Reg[2];}
+                    3:{out Reg[3];}
+                    4:{out Reg[4];}
+                    5:{out Reg[5];}
+                    6:{out Reg[6];}
+                    7:{out Reg[7];}
+                }
             }
             `jmp:{
                 ip = imm;
             }
             `in:{
-                write_adr = imm;
-                in write_data;
-                write = 1;
+                imm %= 8;
+                case(imm){
+                    0:{in Reg[0];}
+                    1:{in Reg[1];}
+                    2:{in Reg[2];}
+                    3:{in Reg[3];}
+                    4:{in Reg[4];}
+                    5:{in Reg[5];}
+                    6:{in Reg[6];}
+                    7:{in Reg[7];}
+                }
             }
         }
     }elif(decode_inst){
