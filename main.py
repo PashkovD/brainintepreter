@@ -18,14 +18,32 @@ def main():
         "data": decorate(data),
         "data_size": str(len(data)),
 
-        "stop": "0",
-        "out": "1",
-        "jmp": "2",
-        "in": "3",
-        "add": "4",
-        "addr": "5",
-        "sub": "6",
-        "subr": "7"
+        "stop": "255",
+        "out": "254",
+        "in": "253",
+
+        "add": "0",
+        "addr": "1",
+        "sub": "2",
+        "subr": "3",
+        "mov": "4",
+        "movr": "5",
+
+        "cmp": "6",
+        "cmpr": "7",
+
+        "jmp": "8",
+        "je": "9",
+        "jne": "10",
+        "jl": "11",
+        "jnl": "12",
+        "jg": "13",
+        "jng": "14",
+
+        "shl": "19",
+        "shlr": "20",
+        "shr": "21",
+        "shrr": "22",
     }
     with open("code.txt") as f:
         code = f.read()

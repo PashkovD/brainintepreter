@@ -2,6 +2,9 @@ int ip = 0;
 int inst;
 int work = 1;
 string Reg ="\0\0\0\0\0\0\0\0";
+int flag_E = 0;
+int flag_G = 0;
+int flag_L = 0;
 int var1 = 0;
 int var2 = 0;
 
@@ -24,16 +27,16 @@ int imm;
 
 int save_modrm = 0;
 int read_modrm = 0;
-int modrm = 0;
+int modrm;
 
 int save_modrml = 0;
 int read_disp = 0;
 int read_modrml_with_disp = 0;
 int read_modrml_disp = 0;
 int save_disp = 0;
-int disp = 0;
-int modrml = 0;
-int modrmr = 0;
+int disp;
+int modrml;
+int modrmr;
 int write_modrml = 0;
 int write_modrmr = 0;
 
@@ -214,18 +217,48 @@ while(work){
                     7:{in Reg[7];}
                 }
             }
-            `add:{
-                modrml += modrmr;
+            `cmp, `cmpr:{
+                case(inst){
+                    `cmpr:{
+                        var1 = modrml;
+                        modrml = modrmr;
+                        modrmr = var1;
+                    }
+                }
+                var1 = 1;
+                while (var1){
+                    if(modrmr){
+                    }else{
+                        var1 = 0;
+                    }
+                    if(modrml){
+                    }else{
+                        var1 = 0;
+                    }
+                }
+                if(modrml){
+                    flag_G = 1;
+                    flag_E = 0;
+                    flag_L = 0;
+                }elif(modrmr){
+                    flag_G = 0;
+                    flag_E = 0;
+                    flag_L = 1;
+                }else{
+                    flag_G = 0;
+                    flag_E = 1;
+                    flag_L = 0;
+                }
             }
-            `addr:{
-                modrmr += modrml;
-            }
-            `sub:{
-                modrml -= modrmr;
-            }
-            `subr:{
-                modrmr -= modrml;
-            }
+
+            `add:   {modrml += modrmr;}
+            `addr:  {modrmr += modrml;}
+            `sub:   {modrml -= modrmr;}
+            `subr:  {modrmr -= modrml;}
+            `sub:   {modrml -= modrmr;}
+            `subr:  {modrmr -= modrml;}
+            `mov:   {modrml = modrmr;}
+            `movr:  {modrmr = modrml;}
         }
     }elif(decode_inst){
         decode_inst = 0;
@@ -243,13 +276,16 @@ while(work){
             `in:{
                 read_imm = 1;
             }
-            `add, `sub:{
+            `add, `sub, `mov:{
                 read_modrm = 1;
 				write_modrml = 1;
             }
-            `addr, `subr:{
+            `addr, `subr, `movr:{
                 read_modrm = 1;
 				write_modrmr = 1;
+            }
+            `cmp, `cmpr:{
+                read_modrm = 1;
             }
         }
     }elif(write_modrml){
