@@ -12,7 +12,7 @@ def decorate(data: str) -> str:
 
 
 def main():
-    data = "\x03\x00\x01\x00\x03\x01\x01\x01\x03\x02\x01\x02" + "\x00"
+    data = "\x05\xC0a\x01\x00\x05\xC1\x01\x04\x01\x01\x00" + "\x00" +"test"
     names = {
         "cell_size": 256,
         "data": decorate(data),
@@ -22,6 +22,10 @@ def main():
         "out": "1",
         "jmp": "2",
         "in": "3",
+        "add": "4",
+        "addr": "5",
+        "sub": "6",
+        "subr": "7"
     }
     with open("code.txt") as f:
         code = f.read()

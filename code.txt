@@ -1,4 +1,5 @@
 int ip = 0;
+int inst;
 int work = 1;
 string Reg ="\0\0\0\0\0\0\0\0";
 int var1 = 0;
@@ -16,11 +17,25 @@ int write_data;
 int save_inst = 0;
 int proc_inst = 0;
 int decode_inst = 0;
-int inst;
 
 int save_imm = 0;
 int read_imm = 0;
 int imm;
+
+int save_modrm = 0;
+int read_modrm = 0;
+int modrm = 0;
+
+int save_modrml = 0;
+int read_disp = 0;
+int read_modrml_with_disp = 0;
+int read_modrml_disp = 0;
+int save_disp = 0;
+int disp = 0;
+int modrml = 0;
+int modrmr = 0;
+int write_modrml = 0;
+int write_modrmr = 0;
 
 
 string data = "`data";
@@ -41,8 +56,7 @@ while(work){
         } else {
             read_data = data[2];
         }
-    }
-    if (write){
+    }elif (write){
         write = 0;
         if (write_adr){
             data[3] = write_adr;
@@ -77,19 +91,93 @@ while(work){
         } else {
             write_data = data[2];
         }
-    }
-
-    if (save_inst){
+    }elif (save_inst){
         save_inst = 0;
         inst = read_data;
         ip += 1;
-    }elif (save_imm){
+    }elif (save_modrm) {
+		save_modrm = 0;
+		modrm = read_data;
+		var1 = modrm;
+		var1 %= 8;
+		case(var1){
+            0:{modrmr = Reg[0];}
+            1:{modrmr = Reg[1];}
+            2:{modrmr = Reg[2];}
+            3:{modrmr = Reg[3];}
+            4:{modrmr = Reg[4];}
+            5:{modrmr = Reg[5];}
+            6:{modrmr = Reg[6];}
+            7:{modrmr = Reg[7];}
+        }
+
+        var1 = modrm;
+        var1 /= 8;
+		var1 %= 8;
+		case(var1){
+            0:{modrml = Reg[0];}
+            1:{modrml = Reg[1];}
+            2:{modrml = Reg[2];}
+            3:{modrml = Reg[3];}
+            4:{modrml = Reg[4];}
+            5:{modrml = Reg[5];}
+            6:{modrml = Reg[6];}
+            7:{modrml = Reg[7];}
+        }
+        var1 = modrm;
+        var1 /= 64;
+		case(var1){
+			0: {
+				# modrml = modrml;
+			}
+			1: {
+				read = 1;
+				read_adr = modrml;
+				save_modrml = 1;
+			}
+			2: {
+				read_disp = 1;
+				# modrml = modrml;
+				read_modrml_with_disp = 1;
+			}
+			3: {
+				read_disp = 1;
+				read_modrml_disp = 1;
+			}
+		}
+	}elif (save_disp){
+		save_disp = 0;
+		disp = read_data;
+	}elif (read_disp){
+		read_disp = 0;
+		read = 1;
+		read_adr = ip;
+		save_disp = 1;
+		ip += 1;
+	}elif (read_modrml_with_disp){
+		read_modrml_with_disp = 0;
+		read = 1;
+		read_adr = modrml;
+		read_adr += disp;
+		save_modrml = 1;
+	}elif (read_modrml_disp){
+		read_modrml_disp = 0;
+		modrml = disp;
+	}elif (save_modrml){
+		save_modrml = 0;
+		modrml = read_data;
+	}elif (read_modrm){
+		read_modrm = 0;
+		save_modrm = 1;
+		read = 1;
+		read_adr = ip;
+		ip += 1;
+	}elif (save_imm){
         save_imm = 0;
         imm = read_data;
         ip += 1;
-    }
 
-    if(read_imm){
+    }elif(read_imm){
         read_imm = 0;
         read = 1;
         save_imm = 1;
@@ -126,6 +214,18 @@ while(work){
                     7:{in Reg[7];}
                 }
             }
+            `add:{
+                modrml += modrmr;
+            }
+            `addr:{
+                modrmr += modrml;
+            }
+            `sub:{
+                modrml -= modrmr;
+            }
+            `subr:{
+                modrmr -= modrml;
+            }
         }
     }elif(decode_inst){
         decode_inst = 0;
@@ -143,6 +243,85 @@ while(work){
             `in:{
                 read_imm = 1;
             }
+            `add, `sub:{
+                read_modrm = 1;
+				write_modrml = 1;
+            }
+            `addr, `subr:{
+                read_modrm = 1;
+				write_modrmr = 1;
+            }
+        }
+    }elif(write_modrml){
+        write_modrml = 0;
+        var2 = modrm;
+        var2 /= 64;
+        case(var2){
+            0:{
+                var1 = modrm;
+                var1 /= 8;
+                var1 %= 8;
+                case(var1){
+                    0:{Reg[0] = modrml;}
+                    1:{Reg[1] = modrml;}
+                    2:{Reg[2] = modrml;}
+                    3:{Reg[3] = modrml;}
+                    4:{Reg[4] = modrml;}
+                    5:{Reg[5] = modrml;}
+                    6:{Reg[6] = modrml;}
+                    7:{Reg[7] = modrml;}
+                }
+            }
+            1:{
+                write = 1;
+                write_data = modrml;
+                var1 = modrm;
+                var1 /= 8;
+                var1 %= 8;
+                case(var1){
+                    0:{write_adr = Reg[0];}
+                    1:{write_adr = Reg[1];}
+                    2:{write_adr = Reg[2];}
+                    3:{write_adr = Reg[3];}
+                    4:{write_adr = Reg[4];}
+                    5:{write_adr = Reg[5];}
+                    6:{write_adr = Reg[6];}
+                    7:{write_adr = Reg[7];}
+                }
+            }
+            2:{
+                write = 1;
+                write_data = modrml;
+                var1 = modrm;
+                var1 /= 8;
+                var1 %= 8;
+                case(var1){
+                    0:{write_adr = Reg[0];}
+                    1:{write_adr = Reg[1];}
+                    2:{write_adr = Reg[2];}
+                    3:{write_adr = Reg[3];}
+                    4:{write_adr = Reg[4];}
+                    5:{write_adr = Reg[5];}
+                    6:{write_adr = Reg[6];}
+                    7:{write_adr = Reg[7];}
+                }
+                write_adr += disp;
+            }
+            3:{}
+        }
+    }elif(write_modrmr){
+        write_modrmr = 0;
+        var1 = modrm;
+        var1 %= 8;
+        case(var1){
+            0:{Reg[0] = modrmr;}
+            1:{Reg[1] = modrmr;}
+            2:{Reg[2] = modrmr;}
+            3:{Reg[3] = modrmr;}
+            4:{Reg[4] = modrmr;}
+            5:{Reg[5] = modrmr;}
+            6:{Reg[6] = modrmr;}
+            7:{Reg[7] = modrmr;}
         }
     }else{
         save_inst = 1;
