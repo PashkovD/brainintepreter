@@ -8,6 +8,12 @@ int flag_L = 0;
 int var1 = 0;
 int var2 = 0;
 
+int imm;
+int modrm;
+int disp;
+int modrml;
+int modrmr;
+
 int read = 0;
 int read_adr;
 int read_data;
@@ -23,20 +29,15 @@ int decode_inst = 0;
 
 int save_imm = 0;
 int read_imm = 0;
-int imm;
 
 int save_modrm = 0;
 int read_modrm = 0;
-int modrm;
 
 int save_modrml = 0;
 int read_disp = 0;
 int read_modrml_with_disp = 0;
 int read_modrml_disp = 0;
 int save_disp = 0;
-int disp;
-int modrml;
-int modrmr;
 int write_modrml = 0;
 int write_modrmr = 0;
 
@@ -201,9 +202,6 @@ while(work){
                     7:{out Reg[7];}
                 }
             }
-            `jmp:{
-                ip = imm;
-            }
             `in:{
                 imm %= 8;
                 case(imm){
@@ -235,7 +233,9 @@ while(work){
                     }else{
                         var1 = 0;
                     }
+                    modrml, modrmr -= 1;
                 }
+                modrml, modrmr += 1;
                 if(modrml){
                     flag_G = 1;
                     flag_E = 0;
@@ -248,6 +248,42 @@ while(work){
                     flag_G = 0;
                     flag_E = 1;
                     flag_L = 0;
+                }
+            }
+            `jmp:{
+                ip = imm;
+            }
+            `je:{
+                if(flag_E){
+                    ip = imm;
+                }
+            }
+            `jne:{
+                if(flag_E){
+                }else{
+                    ip = imm;
+                }
+            }
+            `jl:{
+                if(flag_L){
+                    ip = imm;
+                }
+            }
+            `jnl:{
+                if(flag_L){
+                }else{
+                    ip = imm;
+                }
+            }
+            `jg:{
+                if(flag_G){
+                    ip = imm;
+                }
+            }
+            `jng:{
+                if(flag_G){
+                }else{
+                    ip = imm;
                 }
             }
 
@@ -267,15 +303,21 @@ while(work){
             `out:{
                 read_imm = 1;
             }
-            `stop:{
-                work = 0;
-            }
-            `jmp:{
-                read_imm = 1;
-            }
             `in:{
                 read_imm = 1;
             }
+            `stop:{
+                work = 0;
+            }
+
+            `cmp, `cmpr:{
+                read_modrm = 1;
+            }
+
+            `jmp, `je, `jne, `jl, `jnl, `jg, `jng:{
+                read_imm = 1;
+            }
+
             `add, `sub, `mov:{
                 read_modrm = 1;
 				write_modrml = 1;
@@ -283,9 +325,6 @@ while(work){
             `addr, `subr, `movr:{
                 read_modrm = 1;
 				write_modrmr = 1;
-            }
-            `cmp, `cmpr:{
-                read_modrm = 1;
             }
         }
     }elif(write_modrml){

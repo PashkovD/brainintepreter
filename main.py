@@ -12,7 +12,7 @@ def decorate(data: str) -> str:
 
 
 def main():
-    data = "\x05\xC0a\x01\x00\x05\xC1\x01\x04\x01\x01\x00" + "\x00" +"test"
+    data = "\x05\xC0\x20\x05\xC1\x05\x06\x01\x0b\x02" + "\xff"
     names = {
         "cell_size": 256,
         "data": decorate(data),
@@ -64,9 +64,11 @@ def main():
         code2 += names[name]
 
     data = compile_code(code2)
+    print(f"len : {len(data)}")
     with open("out.bf", "w") as f:
         for i in range(0, len(data), 100):
             f.write(data[i:i + 100] + "\n")
+    print("Done")
 
 
 if __name__ == '__main__':
