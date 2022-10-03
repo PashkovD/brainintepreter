@@ -22,6 +22,8 @@ int write = 0;
 int write_adr;
 int write_data;
 
+int out_string = 0;
+
 
 int save_inst = 0;
 int proc_inst = 0;
@@ -60,8 +62,27 @@ while(work){
         } else {
             read_data = data[2];
         }
+    }elif (out_string){
+        asm("#");
+        if(read_data){
+            out read_data;
+            read = 1;
+            read_adr += 1;
+        }else{
+            out_string = 0;
+            var1 = "\n";
+            out var1;
+        }
     }elif (write){
         write = 0;
+        case(write_adr){
+            255: {
+                out_string = 1;
+                read = 1;
+                read_adr = write_data;
+            }
+        }
+
         if (write_adr){
             data[3] = write_adr;
             data[3] -= 1;
