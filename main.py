@@ -12,7 +12,7 @@ def decorate(data: str) -> str:
 
 
 def main():
-    data = "\x05\xC0\x20\x05\xC1\x05\x06\x01\x0b\x02" + "\xff"
+    data = "\x05\xc0\x20\x05\xc1\x04\x15\x01" + "\xff"
     names = {
         "cell_size": 256,
         "data": decorate(data),

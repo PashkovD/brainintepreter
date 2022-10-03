@@ -275,6 +275,10 @@ while(work){
             `subr:  {modrmr -= modrml;}
             `mov:   {modrml = modrmr;}
             `movr:  {modrmr = modrml;}
+            `shl:   {modrml <<= modrmr;}
+            `shlr:  {modrmr <<= modrml;}
+            `shr:   {modrml >>= modrmr;}
+            `shrr:  {modrmr >>= modrml;}
         }
     }elif(decode_inst){
         decode_inst = 0;
@@ -299,11 +303,11 @@ while(work){
                 read_imm = 1;
             }
 
-            `add, `sub, `mov:{
+            `add, `sub, `mov, `shl, `shr:{
                 read_modrm = 1;
 				write_modrml = 1;
             }
-            `addr, `subr, `movr:{
+            `addr, `subr, `movr, `shlr, `shrr:{
                 read_modrm = 1;
 				write_modrmr = 1;
             }
