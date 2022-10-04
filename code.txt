@@ -5,14 +5,15 @@ string Reg ="\0\0\0\0\0\0\0\0";
 int flag_E = 0;
 int flag_G = 0;
 int flag_L = 0;
-int var1 = 0;
-int var2 = 0;
+int var1;
+int var2;
 
 int imm;
 int modrm;
 int disp;
 int modrml;
 int modrmr;
+int stack_var;
 
 int read = 0;
 int read_adr;
@@ -24,6 +25,9 @@ int write_data;
 
 int out_string = 0;
 
+int save_stack = 0;
+int pop_stack = 0;
+int push_stack = 0;
 
 int save_inst = 0;
 int proc_inst = 0;
@@ -62,8 +66,7 @@ while(work){
         } else {
             read_data = data[2];
         }
-    }elif (out_string){
-        asm("#");
+    }elif(out_string){
         if(read_data){
             out read_data;
             read = 1;
@@ -73,7 +76,7 @@ while(work){
             var1 = "\n";
             out var1;
         }
-    }elif (write){
+    }elif(write){
         write = 0;
         case(write_adr){
             255: {
@@ -116,11 +119,11 @@ while(work){
         } else {
             write_data = data[2];
         }
-    }elif (save_inst){
+    }elif(save_inst){
         save_inst = 0;
         inst = read_data;
         ip += 1;
-    }elif (save_modrm) {
+    }elif(save_modrm) {
 		save_modrm = 0;
 		modrm = read_data;
 		var1 = modrm;
@@ -170,34 +173,34 @@ while(work){
 				read_modrml_disp = 1;
 			}
 		}
-	}elif (save_disp){
+	}elif(save_disp){
 		save_disp = 0;
 		disp = read_data;
-	}elif (read_disp){
+	}elif(read_disp){
 		read_disp = 0;
 		read = 1;
 		read_adr = ip;
 		save_disp = 1;
 		ip += 1;
-	}elif (read_modrml_with_disp){
+	}elif(read_modrml_with_disp){
 		read_modrml_with_disp = 0;
 		read = 1;
 		read_adr = modrml;
 		read_adr += disp;
 		save_modrml = 1;
-	}elif (read_modrml_disp){
+	}elif(read_modrml_disp){
 		read_modrml_disp = 0;
 		modrml = disp;
-	}elif (save_modrml){
+	}elif(save_modrml){
 		save_modrml = 0;
 		modrml = read_data;
-	}elif (read_modrm){
+	}elif(read_modrm){
 		read_modrm = 0;
 		save_modrm = 1;
 		read = 1;
 		read_adr = ip;
 		ip += 1;
-	}elif (save_imm){
+	}elif(save_imm){
         save_imm = 0;
         imm = read_data;
         ip += 1;
@@ -207,6 +210,15 @@ while(work){
         read = 1;
         save_imm = 1;
         read_adr = ip;
+    }elif(save_stack){
+        save_stack = 0;
+        stack_var = read_data;
+    }elif(pop_stack){
+		pop_stack = 0;
+		save_stack = 1;
+		read = 1;
+		Reg[7] -= 1;
+		read_adr = Reg[7];
     }elif(proc_inst){
         proc_inst = 0;
         case(inst){
@@ -300,7 +312,24 @@ while(work){
             `shlr:  {modrmr <<= modrml;}
             `shr:   {modrml >>= modrmr;}
             `shrr:  {modrmr >>= modrml;}
+
+            `push:  {stack_var = modrml;}
+            `pop:   {modrml = stack_var;}
+
+            `call: {
+                stack_var = ip;
+                ip = imm;
+            }
+            `ret: {
+                ip = stack_var;
+            }
         }
+    }elif(push_stack){
+		push_stack = 0;
+		write = 1;
+		write_adr = Reg[7];
+		write_data = stack_var;
+		Reg[7] += 1;
     }elif(decode_inst){
         decode_inst = 0;
         proc_inst = 1;
@@ -332,6 +361,22 @@ while(work){
                 read_modrm = 1;
 				write_modrmr = 1;
             }
+            `push: {
+				read_modrm = 1;
+				push_stack = 1;
+			}
+			`pop: {
+				read_modrm = 1;
+				pop_stack = 1;
+				write_modrml = 1;
+			}
+			`call: {
+				read_imm = 1;
+				push_stack = 1;
+			}
+			`ret: {
+				pop_stack = 1;
+			}
         }
     }elif(write_modrml){
         write_modrml = 0;
