@@ -323,6 +323,58 @@ while(work){
             `ret: {
                 ip = stack_var;
             }
+            `not: {
+                var2 = 0;
+
+                var1 = modrml;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 1;
+                }
+                var1 = modrml;
+                var1 /= 2;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 2;
+                }
+                var1 = modrml;
+                var1 /= 4;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 4;
+                }
+                var1 = modrml;
+                var1 /= 8;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 8;
+                }
+                var1 = modrml;
+                var1 /= 16;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 16;
+                }
+                var1 = modrml;
+                var1 /= 32;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 32;
+                }
+                var1 = modrml;
+                var1 /= 64;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 64;
+                }
+                var1 = modrml;
+                var1 /= 128;
+                var1 %= 2;
+                if (var1){}else{
+                    var2 += 128;
+                }
+                modrml = var2;
+            }
         }
     }elif(push_stack){
 		push_stack = 0;
@@ -353,11 +405,11 @@ while(work){
                 read_imm = 1;
             }
 
-            `add, `sub, `mov, `shl, `shr:{
+            `add, `sub, `mov, `shl, `shr, `and, `xor, `or, `not:{
                 read_modrm = 1;
 				write_modrml = 1;
             }
-            `addr, `subr, `movr, `shlr, `shrr:{
+            `addr, `subr, `movr, `shlr, `shrr, `andr, `xorr, `orr:{
                 read_modrm = 1;
 				write_modrmr = 1;
             }
@@ -376,6 +428,10 @@ while(work){
 			}
 			`ret: {
 				pop_stack = 1;
+			}
+			`not: {
+			    read_modrm = 1;
+				write_modrml = 1;
 			}
         }
     }elif(write_modrml){
