@@ -1,3 +1,5 @@
+string data = "`data";
+
 int ip = 0;
 int inst;
 int work = 1;
@@ -46,9 +48,6 @@ int read_modrml_disp = 0;
 int save_disp = 0;
 int write_modrml = 0;
 int write_modrmr = 0;
-
-
-string data = "`data";
 
 while(work){
     if (read){
