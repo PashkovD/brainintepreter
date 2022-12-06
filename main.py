@@ -1,5 +1,7 @@
 from braincompiler import compile_code
 
+from interpreter import Interpreter
+
 
 def decorate(data: str) -> str:
     data2 = ""
@@ -59,7 +61,7 @@ def main():
         "orr": "28",
         "not": "29",
     }
-    with open("code.txt") as f:
+    with open("code.sl") as f:
         code = f.read()
 
     code2 = ""
@@ -83,6 +85,13 @@ def main():
         for i in range(0, len(data), 100):
             f.write(data[i:i + 100] + "\n")
     print("Done")
+    intr = Interpreter(timeout=100)
+    try:
+        intr(data, "")
+    except TimeoutError:
+        pass
+    out: bytearray = intr.out
+    print(out.decode("utf-8"))
 
 
 if __name__ == '__main__':
