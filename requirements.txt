@@ -1,1 +1,0 @@
-braincompiler @ git+https://github.com/PashkovD/braincompiler.git
