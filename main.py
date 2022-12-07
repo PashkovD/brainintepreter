@@ -7,7 +7,6 @@ def decorate(data: str) -> str:
     data2 = ""
     codes = "0123456789ABCDEF"
     for i in data:
-        data2 += r"\x00\x00"
         var = ord(i)
         data2 += fr"\x{codes[var // 16]}{codes[var % 16]}"
     return data2

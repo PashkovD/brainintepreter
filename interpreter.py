@@ -213,6 +213,7 @@ class Interpreter(Thread):
         self.state = None
 
     def run(self) -> None:
+        print("start", self.name)
         self.state: InterpreterState = InterpreterState(self.inp, self.out)
         try:
             self.proc_code[-1].process(self.state)

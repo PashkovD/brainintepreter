@@ -52,19 +52,7 @@ int write_modrmr = 0;
 while(work){
     if (read){
         read = 0;
-        if (read_adr){
-            data[0] = read_adr;
-            data[1] = 0;
-            goto data[0];
-            asm("[-[->>>+<<<]>>>>[-]+<]");
-            asm(">[-]>[-<+<+>>]<[->+<]+");
-            asm("[<[-<<<+>>>]<<]");
-            asm("<");
-            goto data[0];
-            read_data = data[0];
-        } else {
-            read_data = data[2];
-        }
+        read_data = data[read_adr];
     }elif(out_string){
         if(read_data){
             out read_data;
@@ -84,40 +72,8 @@ while(work){
                 read_adr = write_data;
             }
         }
+        data[write_adr] = write_data;
 
-        if (write_adr){
-            data[3] = write_adr;
-            data[3] -= 1;
-            data[4] = write_data;
-            data[1] = 0;
-            goto data[3];
-            while(data[3]){
-                data[3]-=1;
-                data[6]=0;
-                data[7]=0;
-                while(data[3]){
-                    data[3]-=1;
-                    data[6]+=1;
-                }
-                while(data[4]){
-                    data[4]-=1;
-                    data[7]+=1;
-                }
-                data[4]=1;
-
-                asm(">>>");
-            }
-            data[5]=0;
-            while(data[4]){
-                data[4]-=1;
-                data[5]+=1;
-            }
-            data[4]+=1;
-            goto data[4];
-            asm("[<<<]>>>");
-        } else {
-            write_data = data[2];
-        }
     }elif(save_inst){
         save_inst = 0;
         inst = read_data;
@@ -127,30 +83,13 @@ while(work){
 		modrm = read_data;
 		var1 = modrm;
 		var1 %= 8;
-		case(var1){
-            0:{modrmr = Reg[0];}
-            1:{modrmr = Reg[1];}
-            2:{modrmr = Reg[2];}
-            3:{modrmr = Reg[3];}
-            4:{modrmr = Reg[4];}
-            5:{modrmr = Reg[5];}
-            6:{modrmr = Reg[6];}
-            7:{modrmr = Reg[7];}
-        }
+		modrmr = Reg[var1];
 
         var1 = modrm;
         var1 /= 8;
 		var1 %= 8;
-		case(var1){
-            0:{modrml = Reg[0];}
-            1:{modrml = Reg[1];}
-            2:{modrml = Reg[2];}
-            3:{modrml = Reg[3];}
-            4:{modrml = Reg[4];}
-            5:{modrml = Reg[5];}
-            6:{modrml = Reg[6];}
-            7:{modrml = Reg[7];}
-        }
+		modrml = Reg[var1];
+
         var1 = modrm;
         var1 /= 64;
 		case(var1){
@@ -442,16 +381,7 @@ while(work){
                 var1 = modrm;
                 var1 /= 8;
                 var1 %= 8;
-                case(var1){
-                    0:{Reg[0] = modrml;}
-                    1:{Reg[1] = modrml;}
-                    2:{Reg[2] = modrml;}
-                    3:{Reg[3] = modrml;}
-                    4:{Reg[4] = modrml;}
-                    5:{Reg[5] = modrml;}
-                    6:{Reg[6] = modrml;}
-                    7:{Reg[7] = modrml;}
-                }
+                Reg[var1] = modrml;
             }
             1:{
                 write = 1;
@@ -459,16 +389,7 @@ while(work){
                 var1 = modrm;
                 var1 /= 8;
                 var1 %= 8;
-                case(var1){
-                    0:{write_adr = Reg[0];}
-                    1:{write_adr = Reg[1];}
-                    2:{write_adr = Reg[2];}
-                    3:{write_adr = Reg[3];}
-                    4:{write_adr = Reg[4];}
-                    5:{write_adr = Reg[5];}
-                    6:{write_adr = Reg[6];}
-                    7:{write_adr = Reg[7];}
-                }
+                write_adr = Reg[var1];
             }
             2:{
                 write = 1;
@@ -476,16 +397,7 @@ while(work){
                 var1 = modrm;
                 var1 /= 8;
                 var1 %= 8;
-                case(var1){
-                    0:{write_adr = Reg[0];}
-                    1:{write_adr = Reg[1];}
-                    2:{write_adr = Reg[2];}
-                    3:{write_adr = Reg[3];}
-                    4:{write_adr = Reg[4];}
-                    5:{write_adr = Reg[5];}
-                    6:{write_adr = Reg[6];}
-                    7:{write_adr = Reg[7];}
-                }
+                write_adr = Reg[var1];
                 write_adr += disp;
             }
             3:{}
@@ -494,16 +406,7 @@ while(work){
         write_modrmr = 0;
         var1 = modrm;
         var1 %= 8;
-        case(var1){
-            0:{Reg[0] = modrmr;}
-            1:{Reg[1] = modrmr;}
-            2:{Reg[2] = modrmr;}
-            3:{Reg[3] = modrmr;}
-            4:{Reg[4] = modrmr;}
-            5:{Reg[5] = modrmr;}
-            6:{Reg[6] = modrmr;}
-            7:{Reg[7] = modrmr;}
-        }
+        Reg[var1] = modrmr;
     }else{
         save_inst = 1;
         decode_inst = 1;
