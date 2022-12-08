@@ -1,4 +1,4 @@
-string data = "`data";
+string data = mem_in;
 
 int ip = 0;
 int inst;
