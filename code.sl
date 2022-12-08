@@ -49,6 +49,47 @@ int save_disp = 0;
 int write_modrml = 0;
 int write_modrmr = 0;
 
+#define stop 255
+#define i_out 254
+#define i_in 253
+
+#define add 0
+#define addr 1
+#define sub 2
+#define subr 3
+#define mov 4
+#define movr 5
+
+#define cmp 6
+#define cmpr 7
+
+#define jmp 8
+#define je 9
+#define jne 10
+#define jl 11
+#define jnl 12
+#define jg 13
+#define jng 14
+
+#define push 15
+#define pop 16
+#define call 17
+#define ret 18
+
+#define shl 19
+#define shlr 20
+#define shr 21
+#define shrr 22
+
+#define and 23
+#define andr 24
+#define xor 25
+#define xorr 26
+#define or 27
+#define orr 28
+#define not 29
+
+
 while(work){
     if (read){
         read = 0;
@@ -160,15 +201,15 @@ while(work){
     }elif(proc_inst){
         proc_inst = 0;
         case(inst){
-            `out:{
+            i_out:{
                 out modrml;
             }
-            `in:{
+            i_in:{
                 in modrml;
             }
-            `cmp, `cmpr:{
+            cmp, cmpr:{
                 case(inst){
-                    `cmpr:{
+                    cmpr:{
                         var1 = modrml;
                         modrml = modrmr;
                         modrmr = var1;
@@ -201,67 +242,66 @@ while(work){
                     flag_L = 0;
                 }
             }
-            `jmp:{
+            jmp:{
                 ip = imm;
             }
-            `je:{
+            je:{
                 if(flag_E){
                     ip = imm;
                 }
             }
-            `jne:{
+            jne:{
                 if(flag_E){
                 }else{
                     ip = imm;
                 }
             }
-            `jl:{
+            jl:{
                 if(flag_L){
                     ip = imm;
                 }
             }
-            `jnl:{
+            jnl:{
                 if(flag_L){
                 }else{
                     ip = imm;
                 }
             }
-            `jg:{
+            jg:{
                 if(flag_G){
                     ip = imm;
                 }
             }
-            `jng:{
+            jng:{
                 if(flag_G){
                 }else{
                     ip = imm;
                 }
             }
 
-            `add:   {modrml += modrmr;}
-            `addr:  {modrmr += modrml;}
-            `sub:   {modrml -= modrmr;}
-            `subr:  {modrmr -= modrml;}
-            `sub:   {modrml -= modrmr;}
-            `subr:  {modrmr -= modrml;}
-            `mov:   {modrml = modrmr;}
-            `movr:  {modrmr = modrml;}
-            `shl:   {modrml <<= modrmr;}
-            `shlr:  {modrmr <<= modrml;}
-            `shr:   {modrml >>= modrmr;}
-            `shrr:  {modrmr >>= modrml;}
+            add:   {modrml += modrmr;}
+            addr:  {modrmr += modrml;}
+            sub:   {modrml -= modrmr;}
+            subr:  {modrmr -= modrml;}
+            mov:   {modrml = modrmr;}
+            movr:  {modrmr = modrml;}
 
-            `push:  {stack_var = modrml;}
-            `pop:   {modrml = stack_var;}
+            shl:   {modrml <<= modrmr;}
+            shlr:  {modrmr <<= modrml;}
+            shr:   {modrml >>= modrmr;}
+            shrr:  {modrmr >>= modrml;}
 
-            `call: {
+            push:  {stack_var = modrml;}
+            pop:   {modrml = stack_var;}
+
+            call: {
                 stack_var = ip;
                 ip = imm;
             }
-            `ret: {
+            ret: {
                 ip = stack_var;
             }
-            `not: {
+            not: {
                 var2 = 0;
 
                 var1 = modrml;
@@ -324,50 +364,50 @@ while(work){
         decode_inst = 0;
         proc_inst = 1;
         case(inst){
-            `out:{
+            i_out:{
                 read_modrm = 1;
             }
-            `in:{
+            i_in:{
                 read_modrm = 1;
                 write_modrml = 1;
             }
-            `stop:{
+            stop:{
                 work = 0;
             }
 
-            `cmp, `cmpr:{
+            cmp, cmpr:{
                 read_modrm = 1;
             }
 
-            `jmp, `je, `jne, `jl, `jnl, `jg, `jng:{
+            jmp, je, jne, jl, jnl, jg, jng:{
                 read_imm = 1;
             }
 
-            `add, `sub, `mov, `shl, `shr, `and, `xor, `or, `not:{
+            add, sub, mov, shl, shr, and, xor, or, not:{
                 read_modrm = 1;
 				write_modrml = 1;
             }
-            `addr, `subr, `movr, `shlr, `shrr, `andr, `xorr, `orr:{
+            addr, subr, movr, shlr, shrr, andr, xorr, orr:{
                 read_modrm = 1;
 				write_modrmr = 1;
             }
-            `push: {
+            push: {
 				read_modrm = 1;
 				push_stack = 1;
 			}
-			`pop: {
+			pop: {
 				read_modrm = 1;
 				pop_stack = 1;
 				write_modrml = 1;
 			}
-			`call: {
+			call: {
 				read_imm = 1;
 				push_stack = 1;
 			}
-			`ret: {
+			ret: {
 				pop_stack = 1;
 			}
-			`not: {
+			not: {
 			    read_modrm = 1;
 				write_modrml = 1;
 			}
